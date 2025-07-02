@@ -6,10 +6,19 @@ import Feedback from "./Feedback/Feedback";
 import Notification from "./Notification/Notification";
 import Options from "./Options/Options";
 
+const DEFAULT_FEEDBACK = {
+  good: 0,
+  bad: 0,
+  neutral: 0,
+};
+
 function App() {
   const [feedback, setFeedback] = useState(() => {
     const feedback = localStorage.getItem("feedback");
-    return JSON.parse(feedback);
+    if (feedback) {
+      return JSON.parse(feedback);
+    }
+    return DEFAULT_FEEDBACK;
   });
 
   useEffect(() => {
@@ -23,11 +32,7 @@ function App() {
   };
 
   const onFeedbackReset = () => {
-    setFeedback({
-      good: 0,
-      bad: 0,
-      neutral: 0,
-    });
+    setFeedback(DEFAULT_FEEDBACK);
   };
 
   return (
