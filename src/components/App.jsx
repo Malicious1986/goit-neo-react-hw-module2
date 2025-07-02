@@ -1,24 +1,49 @@
 import "./App.css";
-import friends from "../friends.json";
-import transactions from "../transactions.json";
-import userData from "../userData.json";
-import FriendsList from "./FriendList/FriendsList";
-import Profile from "./Profile/Profile";
-import TransactionHistory from "./TransactionHistory/TransactionHistory";
+import { useState, useEffect } from "react";
+
+import Description from "./Description/Description";
+import Feedback from "./Feedback/Feedback";
+import Notification from "./Notification/Notification";
+import Options from "./Options/Options";
 
 function App() {
+  const [feedback, setFeedback] = useState(() => {
+    const feedback = localStorage.getItem("feedback");
+    return JSON.parse(feedback);
+  });
+
+  useEffect(() => {
+    localStorage.setItem("feedback", JSON.stringify(feedback));
+  }, [feedback]);
+
+  const totalFeedback = feedback.good + feedback.neutral + feedback.bad;
+
+  const updateFeedback = (optionName) => {
+    setFeedback((prev) => ({ ...prev, [optionName]: prev[optionName] + 1 }));
+  };
+
+  const onFeedbackReset = () => {
+    setFeedback({
+      good: 0,
+      bad: 0,
+      neutral: 0,
+    });
+  };
+
   return (
-    <>
-      <Profile
-        name={userData.username}
-        tag={userData.tag}
-        location={userData.location}
-        image={userData.avatar}
-        stats={userData.stats}
+    <div className="container">
+      <Description />
+      <Options
+        updateFeedback={updateFeedback}
+        shouldShowReset={totalFeedback > 0}
+        resetFeedback={onFeedbackReset}
       />
-      <FriendsList friends={friends} />
-      <TransactionHistory items={transactions} />
-    </>
+      {totalFeedback > 0 ? (
+        <Feedback {...feedback} total={totalFeedback} />
+      ) : (
+        <Notification />
+      )}
+    </div>
   );
 }
 
